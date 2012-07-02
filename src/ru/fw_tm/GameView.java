@@ -21,7 +21,7 @@ import java.util.List;
 
 public class GameView extends SurfaceView {
     private List<GameObject> gameObjects;
-    private Platform platform;
+    public Platform platform;
 
     /**
      * Загружаемая картинка
@@ -68,23 +68,18 @@ public class GameView extends SurfaceView {
             }
         });
 
+        loadGameObjects();
+    }
+
+    private void loadGameObjects() {
         gameObjects = new ArrayList<GameObject>();
+
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ball1);
-
-        int count = 5;
-        float x = GameManager.DISTANCE * count;
-        float y = GameManager.DISTANCE * count;
-
-        for (int i = 0; i < count; i++) {
-            Ball ball = new Ball(bmp, x, y);
-            ball.setAlfa(255 / (i + 1));
-            gameObjects.add(ball);
-            x -= GameManager.DISTANCE;
-            y -= GameManager.DISTANCE;
-        }
+        Ball ball = new Ball(this, bmp, 0, 0);
+        gameObjects.add(ball);
 
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.platform);
-        Platform platform = new Platform(bmp, 0, 0);
+        platform = new Platform(this, bmp, 0, 0);
         gameObjects.add(platform);
     }
 

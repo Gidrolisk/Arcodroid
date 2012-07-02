@@ -3,70 +3,81 @@ package ru.fw_tm.model;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import ru.fw_tm.GameManager;
+import ru.fw_tm.GameView;
+import ru.fw_tm.Location;
 
-import java.util.PriorityQueue;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * @author : Ragnarok
  * @date : 02.07.12  0:40
  */
 public class Ball extends GameObject {
+    private static final int TILL_SIZE = 3; // "Длина" хвоста
+
     private float xSpeed, ySpeed;
-    private int alfa;
 
-    private PriorityQueue<Float[]> coords;
+    private Queue<Location> coords;
 
-    public Ball(Bitmap bmp, float initialX, float initialY) {
-        super(bmp, initialX, initialY);
-        x = initialX;
-        y = initialY;
+    public Ball(GameView gameView, Bitmap bmp, float initialX, float initialY) {
+        super(gameView, bmp, initialX, initialY);
         xSpeed = GameManager.SPEED;
         ySpeed = GameManager.SPEED;
-        coords = new PriorityQueue<Float[]>(4);
+        coords = new ArrayDeque<Location>(TILL_SIZE);
     }
 
     private void updatePos(float maxWidth, float maxHeight) {
-        if (x >= maxWidth - bmp.getWidth()) {
-            xSpeed = -GameManager.SPEED;
-        }
-        if (x <= 0) {
+        // расчет координат следующей точки
+        if (loc.getX() + xSpeed <= 0) {
             xSpeed = GameManager.SPEED;
         }
-        if (y >= maxHeight - bmp.getHeight()) {
-            ySpeed = -GameManager.SPEED;
+        if (loc.getX() + xSpeed >= maxWidth - bmp.getWidth()) {
+            xSpeed = -GameManager.SPEED;
         }
-        if (y <= 0) {
+        if (loc.getY() + ySpeed <= 0) {
             ySpeed = GameManager.SPEED;
         }
+        if (loc.getY() + ySpeed >= maxHeight - bmp.getHeight()) {
+            // Проигрыш, если шар коснется этой точки
+            ySpeed = -GameManager.SPEED;
+        }
 
-        if (coords.size() == 4)
+        // Расчет отскока от платформы
+        Location tempLoc = loc.clone().update(loc.getX() + xSpeed, loc.getY() + ySpeed);
+        Rect tempRect = new Rect(rect);
+        tempRect.set((int) tempLoc.getX(), (int) tempLoc.getY(), (int) tempLoc.getX() + bmp.getWidth(), (int) tempLoc.getY() + bmp.getHeight());
+        if (tempRect.intersect(gameView.platform.rect)) {
+            ySpeed = -ySpeed;
+        }
+
+        // Обновление "Хвоста"
+        if (coords.size() == TILL_SIZE)
             coords.poll();
-        coords.add(new Float[]{x, y});
+        coords.add(loc.clone());
 
-        x += xSpeed;
-        y += ySpeed;
-    }
-
-    public void setAlfa(int alfa) {
-        this.alfa = alfa;
+        loc.update(loc.getX() + xSpeed, loc.getY() + ySpeed);
+        rect.set((int) loc.getX(), (int) loc.getY(), (int) loc.getX() + bmp.getWidth(), (int) loc.getY() + bmp.getHeight());
     }
 
     @Override
     public void draw(Canvas canvas, int maxWidth, int maxHeight) {
+        // Обновляем позицию шарика
         updatePos(maxWidth, maxHeight);
 
+        // Рисуем шарик
         Paint paint = new Paint();
-        paint.setAlpha(alfa);
-        canvas.drawBitmap(bmp, (int) x, (int) y, paint);
+        canvas.drawBitmap(bmp, (int) loc.getX(), (int) loc.getY(), paint);
 
-        // Рисуем "Хвост"
+        // Рисуем "Хвост" (c конца)
+        Location[] prevLocs = coords.toArray(new Location[coords.size()]);
 
-        Float[][] cds = coords.toArray(new Float[coords.size()][2]);
-        for (int i = 0; i < cds.length; i++) {
-            Float[] cd = cds[i];
-            paint.setAlpha(255 / (i + 2));
-            canvas.drawBitmap(bmp, cd[0], cd[1], paint);
+        for (int i = 0; i < prevLocs.length; i++) {
+            Location prevLoc = prevLocs[i];
+            paint.setAlpha(255 / (prevLocs.length - i + 1));
+            canvas.drawBitmap(bmp, prevLoc.getX(), prevLoc.getY(), paint);
         }
     }
 }
