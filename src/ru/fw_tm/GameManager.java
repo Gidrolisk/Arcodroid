@@ -10,7 +10,7 @@ import android.graphics.Canvas;
 public class GameManager extends Thread {
     public static final float SPEED = 10.0F;
 
-    private static final short FPS = 90;
+    private static final short FPS = 60;
 
     /**
      * Объект класса GameView
