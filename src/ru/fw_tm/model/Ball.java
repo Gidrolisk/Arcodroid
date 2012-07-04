@@ -24,25 +24,25 @@ public class Ball extends GameObject {
 
     public Ball(GameView gameView, Bitmap bmp, float initialX, float initialY) {
         super(gameView, bmp, initialX, initialY);
-        xSpeed = GameManager.SPEED;
-        ySpeed = GameManager.SPEED;
+        xSpeed = GameManager.SPEED_X;
+        ySpeed = GameManager.SPEED_Y;
         coords = new ArrayDeque<Location>(TILL_SIZE);
     }
 
     private void updatePos(float maxWidth, float maxHeight) {
         // расчет координат следующей точки
         if (loc.getX() + xSpeed <= 0) {
-            xSpeed = GameManager.SPEED;
+            xSpeed = Math.abs(xSpeed);
         }
         if (loc.getX() + xSpeed >= maxWidth - bmp.getWidth()) {
-            xSpeed = -GameManager.SPEED;
+            xSpeed = -Math.abs(xSpeed);
         }
         if (loc.getY() + ySpeed <= 0) {
-            ySpeed = GameManager.SPEED;
+            ySpeed = Math.abs(ySpeed);
         }
         if (loc.getY() + ySpeed >= maxHeight - bmp.getHeight()) {
             // Проигрыш, если шар коснется этой точки
-            ySpeed = -GameManager.SPEED;
+            ySpeed = -Math.abs(ySpeed);
         }
 
         // Расчет отскока от платформы
@@ -51,10 +51,16 @@ public class Ball extends GameObject {
         nextRect.set((int) nextLoc.getX(), (int) nextLoc.getY(), (int) nextLoc.getX() + bmp.getWidth(), (int) nextLoc.getY() + bmp.getHeight());
         Platform.IntersectInfo info = gameView.platform.intersect(nextRect);
         if (info != null) {
-            double a = Math.atan(Math.tan(ySpeed / xSpeed));
-            double b = info.getAngle();
-            xSpeed = (float) (xSpeed * Math.cos(a) / Math.cos(b));
-            ySpeed = (float) (ySpeed * Math.cos(a) / Math.cos(b));
+            double a = info.getAngle();
+            xSpeed = (float) (xSpeed * Math.cos(a));
+            ySpeed = (float) (ySpeed * Math.sin(Math.abs(90 - a)));
+
+            float C1 = GameManager.SPEED_X * GameManager.SPEED_X + GameManager.SPEED_Y * GameManager.SPEED_Y;
+            float C2 = xSpeed * xSpeed + ySpeed * ySpeed;
+
+            float delta = C1 / C2;
+            xSpeed *= delta;
+            ySpeed *= delta;
         }
 
         // Обновление "Хвоста"

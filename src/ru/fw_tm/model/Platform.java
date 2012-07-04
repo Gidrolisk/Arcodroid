@@ -1,8 +1,6 @@
 package ru.fw_tm.model;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
+import android.graphics.*;
 import ru.fw_tm.GameView;
 
 import java.util.ArrayList;
@@ -15,9 +13,7 @@ import java.util.List;
  * Координаты платформы задаются центром её окружности.
  */
 public class Platform extends GameObject {
-    private static final float[] ZONES_ANGLE = {
-            60, 50, 40, 30, 20, 10, 1
-    };
+    private final float[] ZONES_ANGLE;
 
     private final float HEIGHT;
     private final float WIDTH;
@@ -29,6 +25,9 @@ public class Platform extends GameObject {
         HEIGHT = bmp.getHeight();
         WIDTH = bmp.getWidth();
         rect = new Rect((int) (loc.getX() - WIDTH / 2), (int) (loc.getY() - HEIGHT), (int) (loc.getX() + WIDTH / 2), (int) loc.getY());
+
+        int R = (int) (WIDTH / 2);
+        ZONES_ANGLE = new float[R];
 
         left = new ArrayList<Rect>();
         right = new ArrayList<Rect>();
@@ -108,13 +107,16 @@ public class Platform extends GameObject {
         rect.set((int) (loc.getX() - WIDTH / 2), (int) (loc.getY() - HEIGHT), (int) (loc.getX() + WIDTH / 2), (int) loc.getY());
     }
 
+    boolean updatePos = false;
+
     @Override
     public void draw(Canvas canvas, int maxWidth, int maxHeight) {
-        updatePos(maxWidth, maxHeight);
-
+        if (!updatePos) {
+            updatePos(maxWidth, maxHeight);
+            updatePos = true;
+        }
 
         // For debug
-        /*
         Paint p = new Paint();
         p.setColor(Color.BLUE);
 
@@ -126,9 +128,8 @@ public class Platform extends GameObject {
         for (Rect r : right) {
             canvas.drawRect(r, p);
         }
-        */
 
-        canvas.drawBitmap(bmp, rect.left, rect.top, null);
+        //canvas.drawBitmap(bmp, rect.left, rect.top, null);
     }
 
     public IntersectInfo intersect(Rect ballRect) {
@@ -136,13 +137,17 @@ public class Platform extends GameObject {
         for (int i = left.size() - 1; i >= 0; i--) {
             Rect rect1 = left.get(i);
             if (rect1.intersect(ballRect)) {
-                info = new IntersectInfo(ZONES_ANGLE[i]);
+                float angle = (float) Math.toDegrees(Math.atan2(loc.getY() - rect1.top, loc.getY() - rect1.left));
+                info = new IntersectInfo(angle);
+                updatePos = true;
             }
         }
         for (int i = 0; i < right.size(); i++) {
             Rect rect1 = right.get(i);
             if (rect1.intersect(ballRect)) {
-                info = new IntersectInfo(ZONES_ANGLE[i]);
+                float angle = -(float) Math.toDegrees(Math.atan2(loc.getY() - rect1.top, loc.getY() - rect1.left));
+                info = new IntersectInfo(angle);
+                updatePos = true;
             }
         }
         return info;
