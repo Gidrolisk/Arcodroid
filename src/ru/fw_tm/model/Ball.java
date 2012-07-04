@@ -46,11 +46,15 @@ public class Ball extends GameObject {
         }
 
         // Расчет отскока от платформы
-        Location tempLoc = loc.clone().update(loc.getX() + xSpeed, loc.getY() + ySpeed);
-        Rect tempRect = new Rect(rect);
-        tempRect.set((int) tempLoc.getX(), (int) tempLoc.getY(), (int) tempLoc.getX() + bmp.getWidth(), (int) tempLoc.getY() + bmp.getHeight());
-        if (tempRect.intersect(gameView.platform.rect)) {
-            ySpeed = -ySpeed;
+        Location nextLoc = loc.clone().update(loc.getX() + xSpeed, loc.getY() + ySpeed);
+        Rect nextRect = new Rect(rect);
+        nextRect.set((int) nextLoc.getX(), (int) nextLoc.getY(), (int) nextLoc.getX() + bmp.getWidth(), (int) nextLoc.getY() + bmp.getHeight());
+        Platform.IntersectInfo info = gameView.platform.intersect(nextRect);
+        if (info != null) {
+            double a = Math.atan(Math.tan(ySpeed / xSpeed));
+            double b = info.getAngle();
+            xSpeed = (float) (xSpeed * Math.cos(a) / Math.cos(b));
+            ySpeed = (float) (ySpeed * Math.cos(a) / Math.cos(b));
         }
 
         // Обновление "Хвоста"

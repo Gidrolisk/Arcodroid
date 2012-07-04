@@ -15,12 +15,8 @@ import java.util.List;
  * Координаты платформы задаются центром её окружности.
  */
 public class Platform extends GameObject {
-    private static final int[] ZONES_ANGLE_LEFT = {
-            60, 50, 40, 30, 20, 10, 1,
-    };
-
-    private static final int[] ZONES_ANGLE_RIGHT = {
-            1, 10, 20, 30, 40, 50, 60
+    private static final float[] ZONES_ANGLE = {
+            60, 50, 40, 30, 20, 10, 1
     };
 
     private final float HEIGHT;
@@ -37,14 +33,16 @@ public class Platform extends GameObject {
         left = new ArrayList<Rect>();
         right = new ArrayList<Rect>();
 
-        for (int i = 0; i < ZONES_ANGLE_LEFT.length; i++) {
+        for (int i = 0; i < ZONES_ANGLE.length; i++) {
             Rect r = new Rect();
             left.add(r);
         }
-        for (int i = 0; i < ZONES_ANGLE_RIGHT.length; i++) {
+        left.add(new Rect());
+        for (int i = 0; i < ZONES_ANGLE.length; i++) {
             Rect r = new Rect();
             right.add(r);
         }
+        right.add(new Rect());
     }
 
 
@@ -55,27 +53,56 @@ public class Platform extends GameObject {
         int x = (int) (loc.getX() - R);
         int y = (int) (loc.getY());
 
-        for (int i = 0; i < ZONES_ANGLE_LEFT.length; i++) {
-            int x1 = x + R / ZONES_ANGLE_LEFT.length * (i + 1);
-            int y1 = (int) (y - Math.sqrt(R * R - Math.pow(loc.getX() - x1, 2)));
+        int x1 = x, y1 = y;
+        int x2 = 0, y2 = 0;
 
-            int x2 = x1 + R / ZONES_ANGLE_LEFT.length;
-            int y2 = y;
+        for (int i = 0; i < ZONES_ANGLE.length - 1; i++) {
+            x2 = x + R / (ZONES_ANGLE.length - 1) * (i + 1);
+            y2 = y;
+
+            y1 = (int) (y - Math.sqrt(R * R - Math.pow(loc.getX() - x2, 2)));
 
             Rect rect1 = left.get(i);
             rect1.set(x1, y1, x2, y2);
+
+            x1 = x2;
         }
 
-        x = (int) loc.getX();
-        for (int i = 0; i < ZONES_ANGLE_RIGHT.length; i++) {
-            int x1 = x + R / ZONES_ANGLE_RIGHT.length * i;
-            int y1 = (int) (y - Math.sqrt(R * R - Math.pow(loc.getX() - x1, 2)));
+        if (loc.getX() - x1 > 0) {
+            Rect rect2 = left.get(ZONES_ANGLE.length);
+            x1 = x2;
+            y1 = (int) (y - Math.sqrt(R * R - Math.pow(loc.getX() - x1, 2)));
 
-            int x2 = x1 + R / ZONES_ANGLE_RIGHT.length;
-            int y2 = y;
+            x2 = (int) loc.getX();
+            y2 = (int) (loc.getY());
 
-            Rect rect1 = right.get(i);
-            rect1.set(x1, y1, x2, y2);
+            rect2.set(x1, y1, x2, y2);
+        }
+
+        x = (int) loc.getX() + R;
+        x1 = x;
+        y1 = y;
+
+        for (int i = 0; i < ZONES_ANGLE.length - 1; i++) {
+            x2 = x - R / (ZONES_ANGLE.length - 1) * (i + 1);
+            y2 = (int) (y - Math.sqrt(R * R - Math.pow(x2 - loc.getX(), 2)));
+
+            Rect rect1 = right.get(ZONES_ANGLE.length - i - 1);
+            rect1.set(x2, y2, x1, y1);
+
+            x1 = x2;
+        }
+
+        if (x2 - loc.getX() > 0) {
+            Rect rect2 = right.get(ZONES_ANGLE.length);
+
+            x1 = x2;
+            y1 = y;
+
+            x2 = (int) loc.getX();
+            y2 = (int) (loc.getY() - R);
+
+            rect2.set(x2, y2, x1, y1);
         }
 
         rect.set((int) (loc.getX() - WIDTH / 2), (int) (loc.getY() - HEIGHT), (int) (loc.getX() + WIDTH / 2), (int) loc.getY());
@@ -85,6 +112,51 @@ public class Platform extends GameObject {
     public void draw(Canvas canvas, int maxWidth, int maxHeight) {
         updatePos(maxWidth, maxHeight);
 
+
+        // For debug
+        /*
+        Paint p = new Paint();
+        p.setColor(Color.BLUE);
+
+        for (Rect r : left) {
+            canvas.drawRect(r, p);
+        }
+
+        p.setColor(Color.GREEN);
+        for (Rect r : right) {
+            canvas.drawRect(r, p);
+        }
+        */
+
         canvas.drawBitmap(bmp, rect.left, rect.top, null);
+    }
+
+    public IntersectInfo intersect(Rect ballRect) {
+        IntersectInfo info = null;
+        for (int i = left.size() - 1; i >= 0; i--) {
+            Rect rect1 = left.get(i);
+            if (rect1.intersect(ballRect)) {
+                info = new IntersectInfo(ZONES_ANGLE[i]);
+            }
+        }
+        for (int i = 0; i < right.size(); i++) {
+            Rect rect1 = right.get(i);
+            if (rect1.intersect(ballRect)) {
+                info = new IntersectInfo(ZONES_ANGLE[i]);
+            }
+        }
+        return info;
+    }
+
+    public class IntersectInfo {
+        private final float angle;
+
+        public IntersectInfo(float angle) {
+            this.angle = angle;
+        }
+
+        public float getAngle() {
+            return angle;
+        }
     }
 }
