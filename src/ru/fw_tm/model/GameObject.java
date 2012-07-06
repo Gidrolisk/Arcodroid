@@ -14,6 +14,7 @@ public abstract class GameObject {
     protected GameView gameView;
     protected Bitmap bmp;
     protected Location loc;
+
     Rect rect;
 
     public GameObject(GameView gameView, Bitmap bmp, float initialX, float initialY) {

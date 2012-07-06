@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameView extends SurfaceView {
+    private Accelerometer accelerometer;
+
     private List<GameObject> gameObjects;
     public Platform platform;
 
@@ -40,6 +42,7 @@ public class GameView extends SurfaceView {
 
     public GameView(Context context) {
         super(context);
+        accelerometer = new Accelerometer();
         gameLoopThread = new GameManager(this);
         holder = getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -90,5 +93,9 @@ public class GameView extends SurfaceView {
         for (GameObject gameObject : gameObjects) {
             gameObject.draw(canvas, getWidth(), getHeight());
         }
+    }
+
+    public Accelerometer getAccelerometer() {
+        return accelerometer;
     }
 }

@@ -1,16 +1,18 @@
 package ru.fw_tm;
 
 import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
-import dalvik.system.DexFile;
 
 /**
  * @author : Ragnarok
  * @date : 27.06.12  22:54
  */
 public class GameActivity extends Activity {
+    static GameView gameView;
 
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -23,6 +25,12 @@ public class GameActivity extends Activity {
 
         // и без заголовка
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(new GameView(this));
+        gameView = new GameView(this);
+        setContentView(gameView);
+
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(gameView.getAccelerometer(),
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
     }
 }

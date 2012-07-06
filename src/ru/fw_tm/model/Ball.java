@@ -27,6 +27,7 @@ public class Ball extends GameObject {
         xSpeed = GameManager.SPEED_X;
         ySpeed = GameManager.SPEED_Y;
         coords = new ArrayDeque<Location>(TILL_SIZE);
+
     }
 
     private void updatePos(float maxWidth, float maxHeight) {
@@ -51,16 +52,15 @@ public class Ball extends GameObject {
         nextRect.set((int) nextLoc.getX(), (int) nextLoc.getY(), (int) nextLoc.getX() + bmp.getWidth(), (int) nextLoc.getY() + bmp.getHeight());
         Platform.IntersectInfo info = gameView.platform.intersect(nextRect);
         if (info != null) {
-            double a = info.getAngle();
-            xSpeed = (float) (xSpeed * Math.cos(a));
-            ySpeed = (float) (ySpeed * Math.sin(Math.abs(90 - a)));
+            float SPD = GameManager.SPEED_X * GameManager.SPEED_X + GameManager.SPEED_Y * GameManager.SPEED_Y;
 
-            float C1 = GameManager.SPEED_X * GameManager.SPEED_X + GameManager.SPEED_Y * GameManager.SPEED_Y;
-            float C2 = xSpeed * xSpeed + ySpeed * ySpeed;
+            float alpha = info.getDistance();
+            if (xSpeed <= 0)
+                xSpeed = -(float) (Math.tan(alpha) * Math.sqrt(SPD / (1 + Math.pow(Math.tan(alpha), 2))));
+            else
+                xSpeed = (float) (Math.tan(alpha) * Math.sqrt(SPD / (1 + Math.pow(Math.tan(alpha), 2))));
 
-            float delta = C1 / C2;
-            xSpeed *= delta;
-            ySpeed *= delta;
+            ySpeed = -(float) Math.sqrt(SPD / (1 + Math.pow(Math.tan(alpha), 2)));
         }
 
         // Обновление "Хвоста"
