@@ -7,23 +7,18 @@ package ru.fw_tm;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import ru.fw_tm.model.Ball;
-import ru.fw_tm.model.GameObject;
-import ru.fw_tm.model.Platform;
-
-import java.util.ArrayList;
-import java.util.List;
+import ru.fw_tm.level.AbstractLevel;
+import ru.fw_tm.level.Level1;
+import ru.fw_tm.level.Level2;
 
 public class GameView extends SurfaceView {
     private Accelerometer accelerometer;
 
-    private List<GameObject> gameObjects;
-    public Platform platform;
+    private AbstractLevel currentLevel;
 
     /**
      * Загружаемая картинка
@@ -71,31 +66,21 @@ public class GameView extends SurfaceView {
             }
         });
 
-        loadGameObjects();
-    }
-
-    private void loadGameObjects() {
-        gameObjects = new ArrayList<GameObject>();
-
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ball1);
-        Ball ball = new Ball(this, bmp, 0, 0);
-        gameObjects.add(ball);
-
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.platform);
-        platform = new Platform(this, bmp, 0, 0);
-        gameObjects.add(platform);
+        currentLevel = new Level2();
+        currentLevel.load(this, getResources());
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
-
-        for (GameObject gameObject : gameObjects) {
-            gameObject.draw(canvas, getWidth(), getHeight());
-        }
+        currentLevel.drawLevel(canvas, getWidth(), getHeight());
     }
 
     public Accelerometer getAccelerometer() {
         return accelerometer;
+    }
+
+    public AbstractLevel getCurrentLevel() {
+        return currentLevel;
     }
 }

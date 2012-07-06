@@ -50,7 +50,7 @@ public class Ball extends GameObject {
         Location nextLoc = loc.clone().update(loc.getX() + xSpeed, loc.getY() + ySpeed);
         Rect nextRect = new Rect(rect);
         nextRect.set((int) nextLoc.getX(), (int) nextLoc.getY(), (int) nextLoc.getX() + bmp.getWidth(), (int) nextLoc.getY() + bmp.getHeight());
-        Platform.IntersectInfo info = gameView.platform.intersect(nextRect);
+        Platform.IntersectInfo info = gameView.getCurrentLevel().getPlatform().intersect(nextRect);
         if (info != null) {
             float SPD = GameManager.SPEED_X * GameManager.SPEED_X + GameManager.SPEED_Y * GameManager.SPEED_Y;
 

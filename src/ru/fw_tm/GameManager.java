@@ -13,6 +13,8 @@ public class GameManager extends Thread {
 
     public static final float PLATFORM_SPEED = 10.0F;
 
+    public static final int BOTTOM_SHIFT = 90;
+
     private static final short FPS = 90;
     /**
      * Объект класса GameView
