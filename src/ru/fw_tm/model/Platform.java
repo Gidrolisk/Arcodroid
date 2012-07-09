@@ -16,7 +16,6 @@ import java.util.List;
  * Координаты платформы задаются центром её окружности.
  */
 public class Platform extends GameObject {
-    private static final int BOTTOM_SHIFT = 20;
     private final int HEIGHT;
     private final int WIDTH;
 
@@ -61,7 +60,7 @@ public class Platform extends GameObject {
         if (loc.getX() + xSpeed > maxWidth - WIDTH) {
             xSpeed = 0;
         }
-        loc.update(loc.getX() + xSpeed, maxHeight - BOTTOM_SHIFT);
+        loc.update(loc.getX() + xSpeed, maxHeight - GameManager.BOTTOM_SHIFT);
 
         rect.set((int) loc.getX(), (int) (loc.getY() - HEIGHT), (int) (loc.getX() + WIDTH), (int) loc.getY());
 

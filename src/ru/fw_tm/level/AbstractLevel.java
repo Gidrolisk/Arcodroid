@@ -9,10 +9,7 @@ import android.view.WindowManager;
 import ru.fw_tm.GameManager;
 import ru.fw_tm.GameView;
 import ru.fw_tm.R;
-import ru.fw_tm.model.Ball;
-import ru.fw_tm.model.Block;
-import ru.fw_tm.model.GameObject;
-import ru.fw_tm.model.Platform;
+import ru.fw_tm.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +22,7 @@ public abstract class AbstractLevel {
     GameView gameView;
     Platform platform;
     List<GameObject> gameObjects;
+    List<Block> blocks;
 
     protected int MAX_WIDTH;
     protected int BLOCK_WIDTH;
@@ -33,6 +31,7 @@ public abstract class AbstractLevel {
 
     public AbstractLevel() {
         gameObjects = new ArrayList<GameObject>();
+        blocks = new ArrayList<Block>();
     }
 
     public void drawLevel(Canvas canvas, int maxWidth, int maxHeight) {
@@ -49,6 +48,9 @@ public abstract class AbstractLevel {
         BLOCK_WIDTH = MAX_WIDTH / 8;
         BLOCK_HEIGHT = MAX_WIDTH / 12;
 
+        Line line = new Line(gameView, null, 0, 0);
+        gameObjects.add(line);
+
         Bitmap bmp = BitmapFactory.decodeResource(resources, R.drawable.ball1);
         Ball ball = new Ball(view, bmp, 0, 0);
         gameObjects.add(ball);
@@ -57,19 +59,24 @@ public abstract class AbstractLevel {
         platform = new Platform(view, bmp, 0, 0);
         gameObjects.add(platform);
 
-
         loadGameObjects(view, resources);
     }
 
     public void addBlocks(Bitmap bmp, int row, int... pos) {
-        int initialY = GameManager.BOTTOM_SHIFT + BLOCK_HEIGHT * (row - 1);
+        int initialY = GameManager.TOP_SHIFT + BLOCK_HEIGHT * (row - 1);
         int i = 1;
         for (int x = 0; x < MAX_WIDTH; x += BLOCK_WIDTH) {
             if (contains(i++, pos)) {
                 Block block = new Block(gameView, bmp, x, initialY);
                 gameObjects.add(block);
+                blocks.add(block);
             }
         }
+    }
+
+    public void deleteBlock(Block block) {
+        block.setDeleted(true);
+        blocks.remove(block);
     }
 
     private boolean contains(int x, int[] array) {
@@ -83,6 +90,10 @@ public abstract class AbstractLevel {
 
     public Platform getPlatform() {
         return platform;
+    }
+
+    public List<Block> getBlocks() {
+        return blocks;
     }
 
     public abstract void loadGameObjects(GameView view, Resources resources);

@@ -6,24 +6,17 @@ package ru.fw_tm;
  */
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import ru.fw_tm.level.AbstractLevel;
 import ru.fw_tm.level.Level1;
-import ru.fw_tm.level.Level2;
 
 public class GameView extends SurfaceView {
     private Accelerometer accelerometer;
 
     private AbstractLevel currentLevel;
-
-    /**
-     * Загружаемая картинка
-     */
-    private Bitmap bmp;
 
     /**
      * Наше поле рисования
@@ -66,7 +59,7 @@ public class GameView extends SurfaceView {
             }
         });
 
-        currentLevel = new Level2();
+        currentLevel = new Level1();
         currentLevel.load(this, getResources());
     }
 

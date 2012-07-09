@@ -22,15 +22,26 @@ public class Ball extends GameObject {
 
     private Queue<Location> coords;
 
+    private boolean posInitialized;
+
     public Ball(GameView gameView, Bitmap bmp, float initialX, float initialY) {
         super(gameView, bmp, initialX, initialY);
         xSpeed = GameManager.SPEED_X;
         ySpeed = GameManager.SPEED_Y;
         coords = new ArrayDeque<Location>(TILL_SIZE);
-
+        posInitialized = false;
     }
 
     private void updatePos(float maxWidth, float maxHeight) {
+        if (!posInitialized) {
+            Platform platform = gameView.getCurrentLevel().getPlatform();
+            int width = gameView.getWidth();
+            int height = gameView.getHeight();
+            int x = width / 2 - bmp.getWidth() / 2;
+            int y = height - (GameManager.BOTTOM_SHIFT + bmp.getHeight() + platform.bmp.getHeight());
+            loc.update(x, y);
+            posInitialized = true;
+        }
         // расчет координат следующей точки
         if (loc.getX() + xSpeed <= 0) {
             xSpeed = Math.abs(xSpeed);
@@ -38,12 +49,21 @@ public class Ball extends GameObject {
         if (loc.getX() + xSpeed >= maxWidth - bmp.getWidth()) {
             xSpeed = -Math.abs(xSpeed);
         }
-        if (loc.getY() + ySpeed <= 0) {
+        if (loc.getY() + ySpeed <= GameManager.TOP_SHIFT) {
             ySpeed = Math.abs(ySpeed);
         }
         if (loc.getY() + ySpeed >= maxHeight - bmp.getHeight()) {
             // Проигрыш, если шар коснется этой точки
             ySpeed = -Math.abs(ySpeed);
+        }
+
+        // Расчет отскока от блока
+        for (Block block : gameView.getCurrentLevel().getBlocks()) {
+            if (block.rect.intersect(rect)) {
+                gameView.getCurrentLevel().deleteBlock(block);
+                ySpeed = -ySpeed;
+                break;
+            }
         }
 
         // Расчет отскока от платформы

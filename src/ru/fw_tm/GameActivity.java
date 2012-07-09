@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -13,6 +14,7 @@ import android.view.WindowManager;
  */
 public class GameActivity extends Activity {
     static GameView gameView;
+    PowerManager.WakeLock wl;
 
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -32,5 +34,15 @@ public class GameActivity extends Activity {
         sensorManager.registerListener(gameView.getAccelerometer(),
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
+
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, getClass().getSimpleName());
+        wl.acquire();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (wl != null)
+            wl.release();
     }
 }

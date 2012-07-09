@@ -8,12 +8,13 @@ package ru.fw_tm;
 import android.graphics.Canvas;
 
 public class GameManager extends Thread {
-    public static final float SPEED_X = 7.0F;
-    public static final float SPEED_Y = 7.0F;
+    public static final float SPEED_X = 5.0F;
+    public static final float SPEED_Y = -5.0F;
 
     public static final float PLATFORM_SPEED = 10.0F;
 
-    public static final int BOTTOM_SHIFT = 90;
+    public static final int TOP_SHIFT = 90;
+    public static final int BOTTOM_SHIFT = 20;
 
     private static final short FPS = 90;
     /**
