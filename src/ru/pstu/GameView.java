@@ -6,12 +6,15 @@ package ru.pstu;
  */
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 import ru.pstu.level.*;
+import ru.pstu.model.LifeBar;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,6 +27,7 @@ public class GameView extends SurfaceView {
 
     private AbstractLevel currentLevel;
     private int level = 0;
+    private LifeBar lifeBar;
 
     /**
      * Наше поле рисования
@@ -72,9 +76,12 @@ public class GameView extends SurfaceView {
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             }
         });
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
+        lifeBar = new LifeBar(this, bmp, 0, 0);
+
         level = 0;
         currentLevel = LEVELS[level];
-        currentLevel.load(this, getResources());
+        currentLevel.load(this, getResources(), lifeBar);
         currentLevel.start();
 
         updateLock = new ReentrantLock();
@@ -108,7 +115,7 @@ public class GameView extends SurfaceView {
             level++;
             if (level < LEVELS.length) {
                 currentLevel = LEVELS[level];
-                currentLevel.load(this, getResources());
+                currentLevel.load(this, getResources(), lifeBar);
                 currentLevel.start();
             } else {
                 Toast.makeText(getContext(), "Вы прошли все уровни! Поздравляем!", 1500).show();
@@ -118,5 +125,13 @@ public class GameView extends SurfaceView {
         } finally {
             updateLock.unlock();
         }
+    }
+
+    public void onLose() {
+        currentLevel.onLose();
+    }
+
+    public LifeBar getLifeBar() {
+        return lifeBar;
     }
 }

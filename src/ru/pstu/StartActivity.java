@@ -80,9 +80,6 @@ public class StartActivity extends Activity implements View.OnClickListener {
                 finish();
             }
             break;
-
-            default:
-                break;
         }
     }
 }

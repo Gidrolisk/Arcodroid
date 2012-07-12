@@ -50,7 +50,7 @@ public class Ball extends DrawableObject {
             gameView.getCurrentLevel().onBallLost();
         }
 
-        // Расчет отскока от блока
+        // Расчет отскока от блоков
         for (Block block : gameView.getCurrentLevel().getBlocks()) {
             if (block.rect.intersect(rect)) {
                 gameView.getCurrentLevel().deleteBlock(block);

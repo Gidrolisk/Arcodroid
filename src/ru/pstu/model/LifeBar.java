@@ -11,12 +11,12 @@ import ru.pstu.GameView;
  * @date : 11.07.12  12:59
  */
 public class LifeBar extends DrawableObject {
-    private static final int MAX_LIFES = 3;
+    private static final int MAX_LIFES = 6;
     private int lifeCount;
 
     public LifeBar(GameView gameView, Bitmap bmp, float initialX, float initialY) {
         super(gameView, bmp, initialX, initialY);
-        lifeCount = 3;
+        lifeCount = MAX_LIFES;
     }
 
     @Override
@@ -32,7 +32,11 @@ public class LifeBar extends DrawableObject {
         }
     }
 
-    public void decreaseLife() {
-        lifeCount--;
+    public boolean decreaseLife() {
+        if (lifeCount-- == 0) {
+            gameView.onLose();
+            return false;
+        }
+        return true;
     }
 }

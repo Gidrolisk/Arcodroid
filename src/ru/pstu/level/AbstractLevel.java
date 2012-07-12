@@ -35,7 +35,6 @@ public abstract class AbstractLevel {
     GameView gameView;
     Platform platform;
     Ball ball;
-    LifeBar lifeBar;
 
     LevelState levelState;
     Text text;
@@ -92,7 +91,7 @@ public abstract class AbstractLevel {
         }
     }
 
-    public void load(GameView view, Resources resources) {
+    public void load(GameView view, Resources resources, LifeBar lifeBar) {
         gameView = view;
         WindowManager windowManager = (WindowManager) view.getContext().getSystemService(Context.WINDOW_SERVICE);
         MAX_WIDTH = windowManager.getDefaultDisplay().getWidth();
@@ -104,15 +103,14 @@ public abstract class AbstractLevel {
         BackgroundImage image = new BackgroundImage(gameView, bmp, 0, 0);
         gameObjects.add(image);
 
+        gameObjects.add(lifeBar);
+
         Line line = new Line(gameView, null, 0, 0);
         gameObjects.add(line);
 
         bmp = BitmapFactory.decodeResource(resources, R.drawable.ball);
         ball = new Ball(view, bmp, 0, 0);
         gameObjects.add(ball);
-
-        lifeBar = new LifeBar(gameView, bmp, 0, 0);
-        gameObjects.add(lifeBar);
 
         bmp = BitmapFactory.decodeResource(resources, R.drawable.platform);
         platform = new Platform(view, bmp, 0, 0);
@@ -213,16 +211,24 @@ public abstract class AbstractLevel {
         levelState = LevelState.READY;
         ball.posInitialized = false;
         platform.posInitialized = false;
-        lifeBar.decreaseLife();
+        if (gameView.getLifeBar().decreaseLife()) {
+            Message msg = new Message();
+            msg.what = CHANGE_TEXT;
+            msg.obj = "Ball lost!";
+            levelHandler.sendMessageDelayed(msg, 0);
 
-        Message msg = new Message();
-        msg.what = CHANGE_TEXT;
-        msg.obj = "Ball lost!";
-        levelHandler.sendMessageDelayed(msg, 0);
+            msg = new Message();
+            msg.what = START_AFTER_BALL_LOST;
+            levelHandler.sendMessageDelayed(msg, START_AFTER_BALL_LOST_TIME);
+        }
+    }
 
-        msg = new Message();
-        msg.what = START_AFTER_BALL_LOST;
-        levelHandler.sendMessageDelayed(msg, START_AFTER_BALL_LOST_TIME);
+    public void onLose() {
+        text = new Text(gameView, null, 0, 0);
+        text.setText("Game over!");
+        synchronized (gameObjects) {
+            gameObjects.add(text);
+        }
     }
 
     public static enum LevelState {

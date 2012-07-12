@@ -1,6 +1,7 @@
 package ru.pstu;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -20,7 +21,7 @@ public class GameActivity extends Activity {
         super.onCreate(bundle);
 
         // если хотим, чтобы приложение постоянно имело портретную ориентацию
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // если хотим, чтобы приложение было полноэкранным
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
