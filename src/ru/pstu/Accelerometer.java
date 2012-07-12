@@ -1,4 +1,4 @@
-package ru.fw_tm;
+package ru.pstu;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

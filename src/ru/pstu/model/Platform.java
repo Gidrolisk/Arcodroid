@@ -1,10 +1,11 @@
-package ru.fw_tm.model;
+package ru.pstu.model;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import ru.fw_tm.GameManager;
-import ru.fw_tm.GameView;
+import ru.pstu.GameManager;
+import ru.pstu.GameView;
+import ru.pstu.level.AbstractLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +16,12 @@ import java.util.List;
  * <p/>
  * Координаты платформы задаются центром её окружности.
  */
-public class Platform extends GameObject {
+public class Platform extends DrawableObject {
     private final int HEIGHT;
     private final int WIDTH;
 
     private List<Rect> rects;
-    private boolean needUpdatePos = false;
+    public boolean posInitialized;
 
     public int xSpeed = 0;
 
@@ -35,15 +36,10 @@ public class Platform extends GameObject {
             rects.add(new Rect(0, 0, 0, 0));
         }
 
-        loc.updateX(-100);
-
-        needUpdatePos = true;
+        posInitialized = false;
     }
 
     public void updatePos(int maxWidth, int maxHeight) {
-        if (loc.getX() == -100) {
-            loc.updateX(maxWidth / 2 - WIDTH / 2);
-        }
         int direction = (int) Math.floor(gameView.getAccelerometer().getX());
 
         if (direction < 0) {
@@ -72,7 +68,12 @@ public class Platform extends GameObject {
 
     @Override
     public void draw(Canvas canvas, int maxWidth, int maxHeight) {
-        if (needUpdatePos)
+        if (gameView.getCurrentLevel().getLevelState() == AbstractLevel.LevelState.READY && !posInitialized) {
+            loc.update(maxWidth / 2 - WIDTH / 2, maxHeight - GameManager.BOTTOM_SHIFT);
+            rect.set((int) loc.getX(), (int) (loc.getY() - HEIGHT), (int) (loc.getX() + WIDTH), (int) loc.getY());
+            posInitialized = true;
+        }
+        if (gameView.getCurrentLevel().getLevelState() == AbstractLevel.LevelState.GO)
             updatePos(maxWidth, maxHeight);
 
         canvas.drawBitmap(bmp, rect.left, rect.top, null);

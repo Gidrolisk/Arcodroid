@@ -1,17 +1,17 @@
-package ru.fw_tm.model;
+package ru.pstu.model;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import ru.fw_tm.GameManager;
-import ru.fw_tm.GameView;
+import ru.pstu.GameManager;
+import ru.pstu.GameView;
 
 /**
  * @author : Ragnarok
  * @date : 09.07.12  15:34
  */
-public class Line extends GameObject {
+public class Line extends DrawableObject {
     public Line(GameView gameView, Bitmap bmp, float initialX, float initialY) {
         super(gameView, bmp, initialX, initialY);
     }

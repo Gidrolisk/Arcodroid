@@ -1,10 +1,10 @@
-package ru.fw_tm.level;
+package ru.pstu.level;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import ru.fw_tm.GameView;
-import ru.fw_tm.R;
+import ru.pstu.GameView;
+import ru.pstu.R;
 
 /**
  * @author : Ragnarok

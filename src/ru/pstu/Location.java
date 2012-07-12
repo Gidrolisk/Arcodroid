@@ -1,4 +1,4 @@
-package ru.fw_tm;
+package ru.pstu;
 
 /**
  * @author : Ragnarok

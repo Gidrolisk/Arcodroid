@@ -1,4 +1,4 @@
-package ru.fw_tm;
+package ru.pstu;
 
 /**
  * @author : Ragnarok
@@ -10,13 +10,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import ru.fw_tm.level.AbstractLevel;
-import ru.fw_tm.level.Level1;
+import android.widget.Toast;
+import ru.pstu.level.*;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GameView extends SurfaceView {
+    private Lock updateLock;
+
+    private final AbstractLevel[] LEVELS;
     private Accelerometer accelerometer;
 
     private AbstractLevel currentLevel;
+    private int level = 0;
 
     /**
      * Наше поле рисования
@@ -30,6 +37,13 @@ public class GameView extends SurfaceView {
 
     public GameView(Context context) {
         super(context);
+
+        LEVELS = new AbstractLevel[]{
+                new Level1(), new Level2(), new Level3(), new Level4(),
+                new Level5(), new Level6(), new Level7(), new Level8(),
+                new Level9(), new Level10(), new Level1(), new Level2(),
+                new Level13(), new Level4(), new Level5()
+        };
         accelerometer = new Accelerometer();
         gameLoopThread = new GameManager(this);
         holder = getHolder();
@@ -58,15 +72,25 @@ public class GameView extends SurfaceView {
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             }
         });
-
-        currentLevel = new Level1();
+        level = 0;
+        currentLevel = LEVELS[level];
         currentLevel.load(this, getResources());
+        currentLevel.start();
+
+        updateLock = new ReentrantLock();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
-        currentLevel.drawLevel(canvas, getWidth(), getHeight());
+        updateLock.lock();
+        try {
+            currentLevel.drawLevel(canvas, getWidth(), getHeight());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            updateLock.unlock();
+        }
     }
 
     public Accelerometer getAccelerometer() {
@@ -75,5 +99,24 @@ public class GameView extends SurfaceView {
 
     public AbstractLevel getCurrentLevel() {
         return currentLevel;
+    }
+
+    public void nextLevel() {
+        updateLock.lock();
+        try {
+            currentLevel.unload();
+            level++;
+            if (level < LEVELS.length) {
+                currentLevel = LEVELS[level];
+                currentLevel.load(this, getResources());
+                currentLevel.start();
+            } else {
+                Toast.makeText(getContext(), "Вы прошли все уровни! Поздравляем!", 1500).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            updateLock.unlock();
+        }
     }
 }

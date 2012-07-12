@@ -1,4 +1,4 @@
-package ru.fw_tm;
+package ru.pstu;
 
 import android.app.Activity;
 import android.hardware.Sensor;
@@ -42,6 +42,7 @@ public class GameActivity extends Activity {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         if (wl != null)
             wl.release();
     }

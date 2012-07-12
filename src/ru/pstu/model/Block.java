@@ -1,15 +1,15 @@
-package ru.fw_tm.model;
+package ru.pstu.model;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import ru.fw_tm.GameView;
+import ru.pstu.GameView;
 
 /**
  * @author : Ragnarok
  * @date : 06.07.12  11:27
  */
-public class Block extends GameObject {
+public class Block extends DrawableObject {
 
     private boolean deleted;
 

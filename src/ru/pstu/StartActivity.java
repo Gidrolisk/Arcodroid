@@ -1,4 +1,4 @@
-package ru.fw_tm;
+package ru.pstu;
 
 import android.app.Activity;
 import android.content.Intent;
